@@ -1,16 +1,56 @@
 pragma circom 2.0.0;
 
-/*This circuit template checks that c is the multiplication of a and b.*/  
+template CustomCircuit () {  
 
-template Multiplier2 () {  
+  // Signal inputs
+  signal input A;
+  signal input B;
 
-   // Declaration of signals.  
-   signal input a;  
-   signal input b;  
-   signal output c;  
+  // Signals from gates
+  signal X;
+  signal Y;
 
-   // Constraints.  
-   c <== a * b;  
+  // Component gates used to create a custom circuit
+  component andGate = AND();
+  component notGate = NOT();
+  component orGate = OR();
+
+  // Circuit logic
+  andGate.A <== A;
+  andGate.B <== B;
+  X <== andGate.X; // Connect the AND gate output to X
+
+  notGate.B <== B;
+  Y <== notGate.Y; // Connect the NOT gate output to Y
+
+  orGate.X <== X; // Connect OR gate input X to signal 'X'
+  orGate.Y <== Y; // Connect OR gate input Y to signal 'Y'
+
+  // final output signal Q is connected to the output of the OR gate
+  Q <== orGate.Q;
 }
 
-component main = Multiplier2();
+template AND() {
+  signal input A;
+  signal input B;
+  signal output X;
+
+  X <== A * B;
+}
+
+template NOT() {
+  signal input B;
+  signal output Y;
+
+  Y <== 1 - B;
+}
+
+template OR() {
+  signal input X;
+  signal input Y;
+  signal output Q;
+
+  Q <== X + Y - X * Y;
+}
+
+component main = CustomCircuit();
